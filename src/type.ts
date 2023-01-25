@@ -1,3 +1,5 @@
+import { type } from "os"
+
 export type TUserDB = {
     id : string,
     name :string,
@@ -10,4 +12,8 @@ export type TTasksDB = {
 	description :string,
 	created_at :string,
 	status :number
+}
+export type TUserTaskDB = {
+	user_id: string,
+	task_id: string
 }
