@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express'
 import cors from 'cors'
 import { db } from './database/knex'
-import { TUserDB } from './database/type'
+import { TUserDB } from './type'
 
 
 const app = express()
