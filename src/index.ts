@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express'
 import cors from 'cors'
 import { db } from './database/knex'
-import { TUserDB } from './database/type'
+import { TTasksDB, TUserDB } from './type'
 
 
 const app = express()
@@ -186,6 +186,80 @@ app.get("/tasks", async (req: Request, res: Response) => {
             .orWhere("descrição","LIKE", `%${searchTerm}%`)
             res.status(200).send(result)
         }
+
+    } catch (error) {
+        console.log(error)
+
+        if (req.statusCode === 200) {
+            res.status(500)
+        }
+
+        if (error instanceof Error) {
+            res.send(error.message)
+        } else {
+            res.send("Erro inesperado")
+        }
+    }
+})
+
+//create tasks
+app.post("/tasks", async (req: Request, res: Response) => {
+    try {
+        const{id, title, description } = req.body
+
+        if (typeof id !== "string"){  
+            res.status(400)
+            throw new Error (" 'id' deve ser string")
+        }
+       
+        if (id.length <4 ){
+            res.status(400)
+            throw new Error (" 'id' deve possuir pelo menos caracters ")
+        }
+
+        if (typeof title !== "string"){  
+            res.status(400)
+            throw new Error (" 'title' deve ser string")
+        }
+       
+        if (title.length < 2){
+            res.status(400)
+            throw new Error (" 'title' deve possuir pelo menos caracters ")
+        }
+
+        if (typeof description !== "string"){  
+            res.status(400)
+            throw new Error (" 'description' deve ser string")
+        }
+              
+
+        const [ tasksIdAlreadyExists ]: TTasksDB[] | undefined[] = await db("tasks").where({id})
+
+        if(tasksIdAlreadyExists){
+            res.status(400)
+            throw new Error("'Id' já existe")
+
+        }
+        const [ tasksEmailAlreadyExists ]: TTasksDB[] | undefined[] = await db("tasks").where({title})
+
+        if(tasksEmailAlreadyExists){
+            res.status(400)
+            throw new Error("'Email' já existe")
+        }
+
+        const newTask = {
+            id, 
+            title, 
+            description
+        }
+        await db("tasks").insert(newTask)
+
+        const [insertedTask]: TTasksDB[] = await db("tasks").where({id})
+
+        res.status(201).send({
+        message: "Task criado com sucesso",
+        task: insertedTask
+    })
 
     } catch (error) {
         console.log(error)
