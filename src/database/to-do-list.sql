@@ -43,3 +43,17 @@ VALUES
 SELECT * FROM users;
 SELECT * FROM tasks;
 SELECT * FROM users_tasks;
+
+SELECT*FROM users_tasks
+INNER JOIN users
+ON users_tasks.user_id = user_id
+RIGHT JOIN tasks
+ON users_tasks.task_id = tasks.id
+;
+
+SELECT*FROM tasks
+LEFT JOIN users_tasks
+ON users_tasks.task_id = tasks.id
+LEFT JOIN users
+ON users_tasks.user_id = users.id
+
